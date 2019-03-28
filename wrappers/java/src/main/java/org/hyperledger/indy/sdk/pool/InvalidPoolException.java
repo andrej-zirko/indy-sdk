@@ -12,10 +12,10 @@ public class InvalidPoolException extends IndyException
 	private final static String message = "The pool is closed or invalid and cannot be used.";
 
 	/**
-	 * Initializes a new PoolClosedExecption.
+	 * Initializes a new PoolClosedException.
 	 */
-	public InvalidPoolException() 
-    {
-    	super(message, ErrorCode.PoolLedgerInvalidPoolHandle.value());
-    }
+	public InvalidPoolException()
+	{
+		super(message, ErrorCode.PoolLedgerInvalidPoolHandle.value());
+	}
 }

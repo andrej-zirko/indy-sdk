@@ -5,8 +5,10 @@ using Hyperledger.Indy.Samples.Utils;
 using Hyperledger.Indy.WalletApi;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
+using Console = Colorful.Console;
 
 namespace Hyperledger.Indy.Samples
 {
@@ -14,10 +16,13 @@ namespace Hyperledger.Indy.Samples
     {
         public static async Task Execute()
         {
-            Console.WriteLine("Crypto sample -> started");
+            Console.Write("Executing crypto sample... ");
 
-            var myWalletName = "myWallet";
-            var theirWalletName = "theirWallet";
+            var myWalletConfig = "{\"id\":\"my_wallet\"}";
+            var theirWalletConfig = "{\"id\":\"their_wallet\"}";
+
+            var myWalletCredentials = "{\"key\":\"my_wallet_key\"}";
+            var theirWalletCredentials = "{\"key\":\"their_wallet_key\"}";
 
             try
             {
@@ -25,15 +30,14 @@ namespace Hyperledger.Indy.Samples
                 await PoolUtils.CreatePoolLedgerConfig();
 
                 //2. Create and Open My Wallet
-                await WalletUtils.CreateWalletAsync(PoolUtils.DEFAULT_POOL_NAME, myWalletName, "default", null, null);
+                await WalletUtils.CreateWalletAsync(myWalletConfig, myWalletCredentials);
 
                 // 3. Create and Open Trustee Wallet
-                await WalletUtils.CreateWalletAsync(PoolUtils.DEFAULT_POOL_NAME, theirWalletName, "default", null, null);
+                await WalletUtils.CreateWalletAsync(theirWalletConfig, theirWalletCredentials);
 
                 //4. Open pool and wallets in using statements to ensure they are closed when finished.
-                using (var pool = await Pool.OpenPoolLedgerAsync(PoolUtils.DEFAULT_POOL_NAME, "{}"))
-                using (var myWallet = await Wallet.OpenWalletAsync(myWalletName, null, null))
-                using (var theirWallet = await Wallet.OpenWalletAsync(theirWalletName, null, null))
+                using (var myWallet = await Wallet.OpenWalletAsync(myWalletConfig, myWalletCredentials))
+                using (var theirWallet = await Wallet.OpenWalletAsync(theirWalletConfig, theirWalletCredentials))
                 {
                     //5. Create My Did
                     var createMyDidResult = await Did.CreateAndStoreMyDidAsync(myWallet, "{}");
@@ -66,18 +70,21 @@ namespace Hyperledger.Indy.Samples
                     //10. Close wallets and pool
                     await myWallet.CloseAsync();
                     await theirWallet.CloseAsync();
-                    await pool.CloseAsync();
                 }
+
+                Console.WriteLine("OK", Color.Green);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}", Color.Red);
             }
             finally
             {
                 // 11. Delete wallets and Pool ledger config
-                await WalletUtils.DeleteWalletAsync(myWalletName, null);
-                await WalletUtils.DeleteWalletAsync(theirWalletName, null);
+                await WalletUtils.DeleteWalletAsync(myWalletConfig, myWalletCredentials);
+                await WalletUtils.DeleteWalletAsync(theirWalletConfig, theirWalletCredentials);
                 await PoolUtils.DeletePoolLedgerConfigAsync(PoolUtils.DEFAULT_POOL_NAME);
-            }            
-
-            Console.WriteLine("Crypto sample -> completed");
+            }
         }
     }
 }
