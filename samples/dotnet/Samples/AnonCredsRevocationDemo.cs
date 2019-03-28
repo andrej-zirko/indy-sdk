@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading.Tasks;
 using Hyperledger.Indy.AnonCredsApi;
 using Hyperledger.Indy.BlobStorageApi;
@@ -7,6 +8,7 @@ using Hyperledger.Indy.PoolApi;
 using Hyperledger.Indy.Samples.Utils;
 using Hyperledger.Indy.WalletApi;
 using Newtonsoft.Json.Linq;
+using Console = Colorful.Console;
 
 namespace Hyperledger.Indy.Samples
 {
@@ -14,10 +16,13 @@ namespace Hyperledger.Indy.Samples
     {
         public static async Task Execute()
         {
-            Console.WriteLine("Anoncreds Revocation sample -> started");
+            Console.Write("Executing anoncreds with revocation sample... ");
 
-            var issuerWalletName = "issuerWallet";
-            var proverWalletName = "proverWallet";
+            var proverWalletConfig = "{\"id\":\"prover_wallet\"}";
+            var issuerWalletConfig = "{\"id\":\"issuer_wallet\"}";
+
+            var issuerWalletCredentials = "{\"key\":\"issuer_wallet_key\"}";
+            var proverWalletCredentials = "{\"key\":\"prover_wallet_key\"}";
 
             var issuerDid = "NcYxiDXkpYi6ov5FcYDi1e";
             var proverDid = "VsKV7grR1BUE29mG2Fm2kX";
@@ -28,15 +33,14 @@ namespace Hyperledger.Indy.Samples
                 await PoolUtils.CreatePoolLedgerConfig();
 
                 //2. Issuer Create and Open Wallet
-                await WalletUtils.CreateWalletAsync(PoolUtils.DEFAULT_POOL_NAME, issuerWalletName, "default", null, null);
+                await WalletUtils.CreateWalletAsync(issuerWalletConfig, issuerWalletCredentials);
 
                 //3. Prover Create and Open Wallet
-                await WalletUtils.CreateWalletAsync(PoolUtils.DEFAULT_POOL_NAME, proverWalletName, "default", null, null);
+                await WalletUtils.CreateWalletAsync(proverWalletConfig, proverWalletCredentials);
 
                 // Open pool and wallets in using statements to ensure they are closed when finished.
-                using (var pool = await Pool.OpenPoolLedgerAsync(PoolUtils.DEFAULT_POOL_NAME, "{}"))
-                using (var issuerWallet = await Wallet.OpenWalletAsync(issuerWalletName, null, null))
-                using (var proverWallet = await Wallet.OpenWalletAsync(proverWalletName, null, null))
+                using (var issuerWallet = await Wallet.OpenWalletAsync(issuerWalletConfig, issuerWalletCredentials))
+                using (var proverWallet = await Wallet.OpenWalletAsync(proverWalletConfig, proverWalletCredentials))
                 {
                     //4. Issuer Creates Credential Schema
                     var schemaName = "gvt";
@@ -91,7 +95,7 @@ namespace Hyperledger.Indy.Samples
                     var credRevId = createCredentialResult.RevocId;
 
                     //12. Prover Stores Credential
-                    await AnonCreds.ProverStoreCredentialAsync(proverWallet, null, credReqJson, credReqMetadataJson, credential, credDefJson, revRegDefJson);
+                    await AnonCreds.ProverStoreCredentialAsync(proverWallet, null, credReqMetadataJson, credential, credDefJson, revRegDefJson);
 
                     //13. Prover Gets Credentials for Proof Request
                     var proofRequestJson = "{\n" +
@@ -145,18 +149,21 @@ namespace Hyperledger.Indy.Samples
 
                     await issuerWallet.CloseAsync();
                     await proverWallet.CloseAsync();
-                    await pool.CloseAsync();
                 }
+
+                Console.WriteLine("OK", Color.Green);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}", Color.Red);
             }
             finally
             {
                 //17. Delete wallets and Pool ledger config
-                await WalletUtils.DeleteWalletAsync(issuerWalletName, null);
-                await WalletUtils.DeleteWalletAsync(proverWalletName, null);
+                await WalletUtils.DeleteWalletAsync(issuerWalletConfig, issuerWalletCredentials);
+                await WalletUtils.DeleteWalletAsync(proverWalletConfig, proverWalletCredentials);
                 await PoolUtils.DeletePoolLedgerConfigAsync(PoolUtils.DEFAULT_POOL_NAME);
             }
-
-            Console.WriteLine("Anoncreds Revocation sample -> completed");
-		}
-	}
+        }
+    }
 }

@@ -20,7 +20,7 @@ public class LedgerIntegrationTest extends IndyIntegrationTestWithPoolAndSingleW
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
-	public Timeout globalTimeout = new Timeout(2, TimeUnit.MINUTES);
+	public Timeout globalTimeout = new Timeout(5, TimeUnit.MINUTES);
 
 	private static Boolean entitiesPosted = false;
 
@@ -28,13 +28,7 @@ public class LedgerIntegrationTest extends IndyIntegrationTestWithPoolAndSingleW
 	static String credDefId;
 	static String revRegDefId;
 
-	@Before
-	public void setUp() throws Exception {
-		InitHelper.init();
-		postEntities();
-	}
-
-	private void postEntities() throws Exception {
+	void postEntities() throws Exception {
 
 		if (entitiesPosted) {
 			return;

@@ -1,6 +1,6 @@
 ## Indy SDK for .NET
 
-This is a **work-in-progress** .NET wrapper for [ Hyperledger Indy](https://www.hyperledger.org/projects/indy). It is implemented using PInvoke calls to a native c-callable library written in Rust. 
+This is a **work-in-progress** .NET wrapper for [ Hyperledger Indy](https://www.hyperledger.org/projects/hyperledger-indy). It is implemented using PInvoke calls to a native c-callable library written in Rust. 
 Hyperledger Indy is the open-source codebase behind the Sovrin network for self-sovereign digital identity.
 
 The wrapper is designed to be platform independent and targets the .NET Standard 1.1. At present it has been tested on Windows and Ubuntu using .NET 4.5 and .NET Core 2.0.
@@ -31,3 +31,6 @@ the SDK for your specific platform in the [Building Indy SDK](../../README.md#bu
 ### Example use
 
 For a sample project that contains executable demo code showing various usages of the .NET SDK wrapper see the [.NET Sample](../../samples/dotnet/README.md).
+
+#### Troubleshooting
+Use environment variable `RUST_LOG={info|debug|trace}` to output logs of Libindy.

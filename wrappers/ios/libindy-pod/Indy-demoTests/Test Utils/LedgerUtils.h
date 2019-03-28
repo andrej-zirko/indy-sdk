@@ -25,6 +25,11 @@
             withPoolHandle:(IndyHandle)poolHandle
                 resultJson:(NSString **)resultJson;
 
+- (NSError *)submitAction:(NSString *)request
+                    nodes:(NSString *)nodes
+                  timeout:(NSNumber *)timeout
+           withPoolHandle:(IndyHandle)poolHandle
+               resultJson:(NSString **)resultJson;
 
 // MARK: - Nym request
 - (NSError *)buildNymRequestWithSubmitterDid:(NSString *)submitterDid
@@ -72,6 +77,10 @@
                                          data:(NSString *)data
                                    resultJson:(NSString **)resultJson;
 
+// MARK: - Get validator info request
+- (NSError *)buildGetValidatorInfo:(NSString *)submitterDid
+                        resultJson:(NSString **)resultJson;
+
 // MARK: - CredDef Request
 - (NSError *)buildCredDefRequestWithSubmitterDid:(NSString *)submitterDid
                                             data:(NSString *)data
@@ -87,6 +96,7 @@
 
 // MARK: - Get Txn request
 - (NSError *)buildGetTxnRequestWithSubmitterDid:(NSString *)submitterDid
+                                     ledgerType:(NSString *)ledgerType
                                            data:(NSNumber *)data
                                      resultJson:(NSString **)resultJson;
 
@@ -113,6 +123,7 @@
                                        justification:(NSString *)justification
                                            reinstall:(BOOL)reinstall
                                                force:(BOOL)force
+                                            package_:(NSString *)package_
                                           resultJson:(NSString **)resultJson;
 
 // MARK: - Revocation registry definition request
@@ -162,6 +173,33 @@
                             submitterdid:(NSString *)submitterDid
                              requestJson:(NSString *)requestJson
                               resultJson:(NSString **)resultJson;
+
+- (NSError *)multiSignRequestWithWalletHandle:(IndyHandle)walletHandle
+                                 submitterdid:(NSString *)submitterDid
+                                  requestJson:(NSString *)requestJson
+                                   resultJson:(NSString **)resultJson;
+
+// MARK: - Auth Rule request
+- (NSError *)buildAuthRuleRequestWithSubmitterDid:(NSString *)submitterDid
+                                          txnType:(NSString *)txnType
+                                           action:(NSString *)action
+                                            field:(NSString *)field
+                                         oldValue:(NSString *)oldValue
+                                         newValue:(NSString *)newValue
+                                       constraint:(NSString *)constraint
+                                       outRequest:(NSString **)resultJson;
+
+- (NSError *)buildGetAuthRuleRequestWithSubmitterDid:(NSString *)submitterDid
+                                             txnType:(NSString *)txnType
+                                              action:(NSString *)action
+                                               field:(NSString *)field
+                                            oldValue:(NSString *)oldValue
+                                            newValue:(NSString *)newValue
+                                          outRequest:(NSString **)resultJson;
+
+// MARK: - Response Metadata
+- (NSError *)getResponseMetadata:(NSString *)response
+                responseMetadata:(NSString **)responseMetadata;
 
 
 @end

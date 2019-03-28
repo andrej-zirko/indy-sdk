@@ -7,9 +7,9 @@
 #import "IndyCallbacks.h"
 #import "NSError+IndyError.h"
 #import "IndyTypes.h"
+#import "IndyLogger.h"
 
 static NSString *commandCallbackKey = @"commandCallback";
-
 
 @interface IndyCallbacks ()
 
@@ -165,10 +165,11 @@ void IndyWrapperCommonCallback(indy_handle_t xcommand_handle,
     [[IndyCallbacks sharedInstance] deleteCommandHandleFor:xcommand_handle];
 
     void (^completion)(NSError *) = (void (^)(NSError *)) block;
+    
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error);
         });
     }
@@ -181,10 +182,10 @@ void IndyWrapperCommonHandleCallback(indy_handle_t xcommand_handle,
     [[IndyCallbacks sharedInstance] deleteCommandHandleFor:xcommand_handle];
 
     void (^completion)(NSError *, IndyHandle) = (void (^)(NSError *, IndyHandle)) block;
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, (IndyHandle) pool_handle);
         });
     }
@@ -198,11 +199,30 @@ void IndyWrapperCommonNumberCallback(indy_handle_t xcommand_handle,
 
     void (^completion)(NSError *, NSNumber *) = (void (^)(NSError *, NSNumber *arg1)) block;
     NSNumber *sarg1 = @(handle);
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, (NSNumber *) sarg1);
+        });
+    }
+}
+
+
+void IndyWrapperCommonHandleNumberCallback(indy_handle_t xcommand_handle,
+        indy_error_t err,
+        indy_i32_t handle,
+        uint32_t count) {
+    id block = [[IndyCallbacks sharedInstance] commandCompletionFor:xcommand_handle];
+    [[IndyCallbacks sharedInstance] deleteCommandHandleFor:xcommand_handle];
+
+    void (^completion)(NSError *, IndyHandle, NSNumber *) = (void (^)(NSError *, IndyHandle, NSNumber *arg2)) block;
+    NSNumber *sarg2 = @(count);
+    NSError *error = [NSError errorFromIndyError:err];
+
+    if (completion) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(error, (IndyHandle) handle, (NSNumber *) sarg2);
         });
     }
 }
@@ -215,10 +235,10 @@ void IndyWrapperCommonStringCallback(indy_handle_t xcommand_handle,
 
     void (^completion)(NSError *, NSString *) = (void (^)(NSError *, NSString *arg1)) block;
     NSString *sarg1 = [NSString stringWithUTF8String:arg1];
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg1);
         });
     }
@@ -231,10 +251,10 @@ void IndyWrapperCommonBoolCallback(indy_handle_t xcommand_handle,
     [[IndyCallbacks sharedInstance] deleteCommandHandleFor:xcommand_handle];
 
     void (^completion)(NSError *, BOOL) = (void (^)(NSError *, BOOL arg1)) block;
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, (BOOL) arg1);
         });
     }
@@ -251,10 +271,10 @@ void IndyWrapperCommonStringStringCallback(indy_handle_t xcommand_handle,
 
     NSString *sarg1 = [NSString stringWithUTF8String:arg1];
     NSString *sarg2 = [NSString stringWithUTF8String:arg2];
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg1, sarg2);
         });
     }
@@ -274,10 +294,10 @@ void IndyWrapperCommonStringOptStringCallback(indy_handle_t xcommand_handle,
     if (arg1) {
         sarg2 = [NSString stringWithUTF8String:arg2];
     }
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg1, sarg2);
         });
     }
@@ -302,10 +322,10 @@ void IndyWrapperCommonStringOptStringOptStringCallback(indy_handle_t xcommand_ha
     if (arg3) {
         sarg3 = [NSString stringWithUTF8String:arg3];
     }
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg1, sarg2, sarg3);
         });
     }
@@ -324,10 +344,10 @@ void IndyWrapperCommonStringStringStringCallback(indy_handle_t xcommand_handle,
     NSString *sarg1 = [NSString stringWithUTF8String:arg1];
     NSString *sarg2 = [NSString stringWithUTF8String:arg2];
     NSString *sarg3 = [NSString stringWithUTF8String:arg3];
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg1, sarg2, sarg3);
         });
     }
@@ -344,10 +364,10 @@ void IndyWrapperCommonDataCallback(indy_handle_t xcommand_handle,
     void (^completion)(NSError *, NSData *arg) = (void (^)(NSError *, NSData *arg)) block;
 
     NSData *sarg = [NSData dataWithBytes:arg1 length:arg2];
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg);
         });
     }
@@ -368,10 +388,10 @@ void IndyWrapperCommonStringDataCallback(indy_handle_t xcommand_handle,
         sarg1 = [NSString stringWithUTF8String:arg1];
     }
     NSData *sarg2 = [NSData dataWithBytes:arg2 length:arg3];
+    NSError *error = [NSError errorFromIndyError:err];
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, sarg1, sarg2);
         });
     }
@@ -389,11 +409,11 @@ void IndyWrapperCommonStringStringLongCallback(indy_handle_t xcommand_handle,
     NSString *sarg1 = [NSString stringWithUTF8String:arg1];
     NSString *sarg2 = [NSString stringWithUTF8String:arg2];
     NSNumber *sarg3 = [NSNumber numberWithInt:arg3];
+    NSError *error = [NSError errorFromIndyError:err];
 
 
     if (completion) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorFromIndyError:err];
             completion(error, (NSString *) sarg1, (NSString *) sarg2, (NSNumber *) sarg3);
         });
     }

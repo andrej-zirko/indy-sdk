@@ -12,8 +12,8 @@ In your maven project add to pom.xml file next content:
     
     
     <repository>
-        <id>evernym</id>
-        <url>https://repo.evernym.com/artifactory/libindy-maven-local</url>
+        <id>sovrin</id>
+        <url>https://repo.sovrin.org/repository/maven-public</url>
     </repository>
 
 2. Inside dependencies tag block add:    
@@ -22,7 +22,7 @@ In your maven project add to pom.xml file next content:
     <dependency>
         <groupId>org.hyperledger</groupId>
         <artifactId>indy</artifactId>
-        <version>1.3.1-dev-410</version>
+        <version>1.8.1-dev-985</version>
     </dependency>
      
 Note that before you can use java wrapper you must install  c-callable SDK. 
@@ -38,3 +38,18 @@ Then copy the resulting `libindy.so` to `./lib/`.
 Then run
 
     mvn clean install
+  
+#### Logging
+The Java wrapper uses slf4j as a facade for various logging frameworks, such as java.util.logging, logback and log4j.
+
+#### Troubleshooting
+If your application that uses libindy crashes with a Null Pointer Exception then probably the libindy shared library could 
+not be loaded properly. If you have build libindy from source then either put the resulting shared library where your
+operating system searches for shared libraries or set appropriate environment variables to help the OS's loader to find them.
+
+On Ubuntu either copy libindy.so to /usr/local/lib or set LD_LIBRARY_PATH to the directory that contains libindy.so.
+
+```
+export LD_LIBRARY_PATH=<path to libindy.so>
+```
+
